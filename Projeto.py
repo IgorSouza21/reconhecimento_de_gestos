@@ -1,5 +1,6 @@
 import numpy as np
 import cv2
+# from principal import *
 
 
 def equaliza_histograma(img):
@@ -16,15 +17,31 @@ def limiarizar(img):
 
 
 def binarizar_YCrCb(image):
-    img = equaliza_histograma(image)
+    #     img = equaliza_histograma(image)
+    #
+    #     piso = np.array([45, 35, 175], dtype=np.uint8)
+    #     teto = np.array([245, 255, 255], dtype=np.uint8)
+    #
+    #     mask = cv2.inRange(img, piso, teto)
+    #     mask = cv2.GaussianBlur(mask, (15, 15), 100)
+    #
+    #     return mask
+    kernel = np.ones((3, 3), np.uint8)
+    img = limiarizar(image)
 
-    piso = np.array([45, 35, 175], dtype=np.uint8)
-    teto = np.array([245, 255, 255], dtype=np.uint8)
+    # Intervalo de cores em YCrCb para pele (foi calibrado no sangue, suor, lágrimas e tristeza)
+    piso = np.array([0, 35, 100], dtype=np.uint8)
+    teto = np.array([245, 175, 135], dtype=np.uint8)
 
     mask = cv2.inRange(img, piso, teto)
-    mask = cv2.GaussianBlur(mask, (15, 15), 100)
+    # isso aqui remove a maior parte dos ruidos
+    mask = cv2.morphologyEx(mask, cv2.MORPH_CLOSE, kernel, iterations=3)
+    mask = cv2.morphologyEx(mask, cv2.MORPH_ERODE, kernel, iterations=2)
 
-    return mask
+    mask = cv2.GaussianBlur(mask, (3, 3), 5)
+    # mask = cv2.medianBlur(mask, 3)
+
+    return 255 - mask
 
 
 def show(image):
@@ -41,7 +58,7 @@ def tentativa2(image):
     mask = cv2.erode(mask, kernel, iterations=1)
     mask = cv2.Canny(mask, 100, 200)
 
-    _, contours, _ = cv2.findContours(mask, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
+    contours, _ = cv2.findContours(mask, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
     contours_poly = [None] * len(contours)
     boundRect = [None] * len(contours)
     areas = [None] * len(contours)
@@ -57,17 +74,22 @@ def tentativa2(image):
     for i in range(len(contours)):
         color = (255, 0, 0)
         cv2.drawContours(drawing, contours_poly, i, color)
-        if areas[i] > 80000:
+        if areas[i] > 75000:
             cv2.rectangle(image, (int(boundRect[i][0]), int(boundRect[i][1])),
                           (int(boundRect[i][0] + boundRect[i][2]), int(boundRect[i][1] + boundRect[i][3])), color, 2)
             cv2.rectangle(drawing, (int(boundRect[i][0]), int(boundRect[i][1])),
                           (int(boundRect[i][0] + boundRect[i][2]), int(boundRect[i][1] + boundRect[i][3])), color, 2)
-    cv2.floodFill(drawing, mask1, (0,0), (255,255,255))
+
+    for i in range(len(contours)):
+        cv2.floodFill(drawing, mask1, (0, 0), (0, 0, 0))
 
     return drawing
 
 
-camera = cv2.VideoCapture(0)
+camera = cv2.VideoCapture(0, cv2.CAP_DSHOW)
+# Check if the webcam is opened correctly
+if not camera.isOpened():
+    raise IOError("Cannot open webcam")
 
 
 def captura():
@@ -88,3 +110,4 @@ def main():
 
 
 main()
+cv2.destroyAllWindows()

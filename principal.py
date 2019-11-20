@@ -4,6 +4,7 @@ import numpy as np
 cap = cv2.VideoCapture(0)
 kernel = np.ones((3, 3), np.uint8)
 
+
 def equaliza_histograma(img):
     Y, Cr, Cb = cv2.split(img)
     y = cv2.equalizeHist(Y)
@@ -11,8 +12,10 @@ def equaliza_histograma(img):
     cb = cv2.equalizeHist(Cb)
     return cv2.merge((y, cr, cb))
 
+
 def mostrarImagem(nomeDaTela, img):
     cv2.imshow(nomeDaTela, img)
+
 
 def limiarizar(img):
     imagem = img
@@ -20,11 +23,12 @@ def limiarizar(img):
 
     return limiar
 
+
 def binarizar_YCrCb(entrada):
     img = entrada
     img = limiarizar(img)
 
-    #Intervalo de cores em YCrCb para pele (foi calibrado no sangue, suor, lágrimas e tristeza)
+    # Intervalo de cores em YCrCb para pele (foi calibrado no sangue, suor, lágrimas e tristeza)
     piso = np.array([0, 35, 100], dtype=np.uint8)
     teto = np.array([245, 175, 135], dtype=np.uint8)
 
@@ -37,8 +41,9 @@ def binarizar_YCrCb(entrada):
 
     return 255-mask
 
-def main():
-    while (True):
+
+def main2():
+    while True:
         ret, imagem = cap.read()
         # imagem = cv2.imread("peles.jpg")
         # imagem = cv2.resize(imagem,(480,640))
@@ -53,12 +58,11 @@ def main():
 
         mostrarImagem("Bin", binarizar_YCrCb(img))
 
-
-
         if(cv2.waitKey(1) & 0xFF == ord('q')):
             print(img.shape)
             cap.release()
             break
 
-main()
+
+main2()
 cv2.destroyAllWindows()
