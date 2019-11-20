@@ -24,20 +24,18 @@ def binarizar_YCrCb(entrada):
     img = entrada
     img = limiarizar(img)
 
-
+    #Intervalo de cores em YCrCb para pele (foi calibrado no sangue, suor, lágrimas e tristeza)
     piso = np.array([0, 35, 100], dtype=np.uint8)
     teto = np.array([245, 175, 135], dtype=np.uint8)
 
     mask = cv2.inRange(img, piso, teto)
+    #isso aqui remove a maior parte dos ruidos
     mask = cv2.morphologyEx(mask, cv2.MORPH_CLOSE, kernel, iterations=3)
     mask = cv2.morphologyEx(mask, cv2.MORPH_ERODE, kernel, iterations=2)
 
-
-    # for i in range(10):
-        # mask = cv2.erode(cv2.dilate(mask, kernel, iterations=1), kernel, iterations=2)
     mask = cv2.GaussianBlur(mask, (3, 3), 5)
 
-    return mask
+    return 255-mask
 
 def main():
     while (True):
