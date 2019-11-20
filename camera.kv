@@ -1,9 +1,14 @@
 <CameraClick>:
     orientation: 'vertical'
-    Camera:
-        id: camera
-        resolution: (800, 600)
-        play: False
+    BoxLayout:
+        Image:
+            id: cam1
+            width: 800
+            height: 600
+        Image:
+            id: cam2
+            width: 800
+            height: 600
     BoxLayout:
         BoxLayout:
             orientation: 'vertical'
@@ -14,6 +19,7 @@
                     id: minY
                     min: root.min
                     max: root.max
+                    value: root.minY
                 Label:
                     text: str(int(minY.value))
             Label:
@@ -23,6 +29,7 @@
                     id: minCr
                     min: root.min
                     max: root.max
+                    value: root.minCr
                 Label:
                     text: str(int(minCr.value))
             Label:
@@ -32,6 +39,7 @@
                     id: minCb
                     min: root.min
                     max: root.max
+                    value: root.minCb
                 Label:
                     text: str(int(minCb.value))
 
@@ -44,6 +52,7 @@
                     id: maxY
                     min: root.min
                     max: root.max
+                    value: root.maxY
                 Label:
                     text: str(int(maxY.value))
             Label:
@@ -53,6 +62,7 @@
                     id: maxCr
                     min: root.min
                     max: root.max
+                    value: root.maxCr
                 Label:
                     text: str(int(maxCr.value))
             Label:
@@ -62,16 +72,17 @@
                     id: maxCb
                     min: root.min
                     max: root.max
+                    value: root.maxCb
                 Label:
                     text: str(int(maxCr.value))
 
-    ToggleButton:
-        text: 'Play'
-        on_press: camera.play = not camera.play
-        size_hint_y: None
-        height: '30dp'
-    Button:
-        text: 'Capture'
-        size_hint_y: None
-        height: '30dp'
-        on_press: root.capture()
+#    ToggleButton:
+#        text: 'Play'
+#        on_press: camera.play = not camera.play
+#        size_hint_y: None
+#        height: '30dp'
+#    Button:
+#        text: 'Capture'
+#        size_hint_y: None
+#        height: '30dp'
+#        on_press: root.capture()

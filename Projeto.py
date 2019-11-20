@@ -16,7 +16,7 @@ def limiarizar(img):
     return limiar
 
 
-def binarizar_YCrCb(image):
+def binarizar_YCrCb(image, piso, teto):
     #     img = equaliza_histograma(image)
     #
     #     piso = np.array([45, 35, 175], dtype=np.uint8)
@@ -30,8 +30,8 @@ def binarizar_YCrCb(image):
     img = limiarizar(image)
 
     # Intervalo de cores em YCrCb para pele (foi calibrado no sangue, suor, lágrimas e tristeza)
-    piso = np.array([0, 35, 100], dtype=np.uint8)
-    teto = np.array([245, 175, 135], dtype=np.uint8)
+    # piso = np.array([0, 35, 100], dtype=np.uint8)
+    # teto = np.array([245, 175, 135], dtype=np.uint8)
 
     mask = cv2.inRange(img, piso, teto)
     # isso aqui remove a maior parte dos ruidos
@@ -44,14 +44,20 @@ def binarizar_YCrCb(image):
     return 255 - mask
 
 
+def deixa_tudo_preto(image, rectangle):
+    for i in range(image.shape[0]):
+        for j in range(image.shape[1]):
+            pass
+
+
 def show(image):
     cv2.imshow("imagem", image)
     cv2.waitKey(0)
 
 
-def tentativa2(image):
+def tentativa2(image, piso, teto):
     img = cv2.cvtColor(image, cv2.COLOR_RGB2YCrCb)
-    img = binarizar_YCrCb(img)
+    img = binarizar_YCrCb(img, piso, teto)
     mask = limiarizar(img)
     kernel = np.array([[-1, -1, -1], [-1, 1, -1], [-1, -1, -1]])
     mask = cv2.dilate(mask, kernel, iterations=7)
@@ -73,15 +79,18 @@ def tentativa2(image):
     mask1 = np.zeros((height + 2, width + 2), dtype=np.uint8)
     for i in range(len(contours)):
         color = (255, 0, 0)
-        cv2.drawContours(drawing, contours_poly, i, color)
+        for con in contours_poly:
+            cv2.drawContours(drawing, [con], -1, (0, 0, 255), cv2.FILLED)
+
         if areas[i] > 75000:
+
             cv2.rectangle(image, (int(boundRect[i][0]), int(boundRect[i][1])),
                           (int(boundRect[i][0] + boundRect[i][2]), int(boundRect[i][1] + boundRect[i][3])), color, 2)
             cv2.rectangle(drawing, (int(boundRect[i][0]), int(boundRect[i][1])),
                           (int(boundRect[i][0] + boundRect[i][2]), int(boundRect[i][1] + boundRect[i][3])), color, 2)
 
-    for i in range(len(contours)):
-        cv2.floodFill(drawing, mask1, (0, 0), (0, 0, 0))
+     # cv2.floodFill(drawing, mask1, (int(boundRect[i][0]), int(boundRect[i][1])), (0, 0, 0))
+    cv2.floodFill(drawing, mask1, (0, 0), (0, 0, 0))
 
     return drawing
 
@@ -109,5 +118,5 @@ def main():
             break
 
 
-main()
-cv2.destroyAllWindows()
+# main()
+# cv2.destroyAllWindows()

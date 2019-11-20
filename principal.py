@@ -26,6 +26,7 @@ def limiarizar(img):
 
 def binarizar_YCrCb(entrada):
     img = entrada
+    img = cv2.medianBlur(img, kernel, 17)
     img = limiarizar(img)
 
     # Intervalo de cores em YCrCb para pele (foi calibrado no sangue, suor, lágrimas e tristeza)
@@ -42,7 +43,7 @@ def binarizar_YCrCb(entrada):
     return 255-mask
 
 
-def main2():
+def main():
     while True:
         ret, imagem = cap.read()
         # imagem = cv2.imread("peles.jpg")
@@ -64,5 +65,5 @@ def main2():
             break
 
 
-main2()
+main()
 cv2.destroyAllWindows()
