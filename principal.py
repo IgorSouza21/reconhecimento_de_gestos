@@ -16,7 +16,6 @@ def mostrarImagem(nomeDaTela, img):
 
 def limiarizar(img):
     imagem = img
-    # imagem = equaliza_histograma(img)
     ret, limiar = cv2.threshold(imagem, 100, 255, cv2.THRESH_TOZERO)
 
     return limiar
@@ -30,13 +29,13 @@ def binarizar_YCrCb(entrada):
     teto = np.array([245, 175, 135], dtype=np.uint8)
 
     mask = cv2.inRange(img, piso, teto)
-    # mask = cv2.dilate(mask,kernel, iterations=5)
-    # mask = cv2.erode(mask,kernel,iterations=5)
-    cv2.imshow("mask",mask)
+    mask = cv2.morphologyEx(mask, cv2.MORPH_CLOSE, kernel, iterations=3)
+    mask = cv2.morphologyEx(mask, cv2.MORPH_ERODE, kernel, iterations=2)
+
 
     # for i in range(10):
         # mask = cv2.erode(cv2.dilate(mask, kernel, iterations=1), kernel, iterations=2)
-    # mask = cv2.GaussianBlur(mask, (15, 15), 15)
+    mask = cv2.GaussianBlur(mask, (3, 3), 5)
 
     return mask
 
@@ -51,7 +50,7 @@ def main():
 
         mostrarImagem("Original",imagem)
 
-        mostrarImagem("Limiar", limiarizar(img))
+        # mostrarImagem("Limiar", limiarizar(img))
 
 
         mostrarImagem("Bin", binarizar_YCrCb(img))
