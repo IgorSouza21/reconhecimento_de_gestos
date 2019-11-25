@@ -30,13 +30,13 @@ def binarizar_YCrCb(entrada):
     #threshold
     img = limiarizar(img)
 
-    #Intervalo de cores em YCrCb para pele (foi calibrado no sangue, suor, lágrimas e tristeza)
-    piso = np.array([0, 60, 75], dtype=np.uint8)
-    teto = np.array([245, 145, 135], dtype=np.uint8)
+    # #Intervalo de cores em YCrCb para pele (foi calibrado no sangue, suor, lágrimas e tristeza)
+    # piso = np.array([0, 60, 75], dtype=np.uint8)
+    # teto = np.array([245, 145, 135], dtype=np.uint8)
 
-    # # Intervalo de cores em YCrCb para pele (foi calibrado no sangue, suor, lágrimas e tristeza)
-    # piso = np.array([0, 35, 100], dtype=np.uint8)
-    # teto = np.array([245, 175, 135], dtype=np.uint8)
+    # Intervalo de cores em YCrCb para pele (foi calibrado no sangue, suor, lágrimas e tristeza)
+    piso = np.array([0, 60, 100], dtype=np.uint8)
+    teto = np.array([245, 175, 135], dtype=np.uint8)
 
     mask = cv2.inRange(img, piso, teto)
     #isso aqui remove a maior parte dos ruidos
