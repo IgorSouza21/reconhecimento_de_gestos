@@ -3,12 +3,12 @@
     BoxLayout:
         Image:
             id: cam1
-            width: 800
-            height: 600
+            width: 640
+            height: 480
         Image:
             id: cam2
-            width: 800
-            height: 600
+            width: 640
+            height: 480
     BoxLayout:
         BoxLayout:
             orientation: 'vertical'
@@ -74,7 +74,7 @@
                     max: root.max
                     value: root.maxCb
                 Label:
-                    text: str(int(maxCr.value))
+                    text: str(int(maxCb.value))
 
 #    ToggleButton:
 #        text: 'Play'
