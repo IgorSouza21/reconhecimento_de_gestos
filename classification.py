@@ -104,7 +104,7 @@ def reconhecimento(base, splits=10, iteration=5):
 def create_dataset():
     imgs, label = loadfolderimgs()
     data = feature_extractor(imgs)
-    data = pd.DataFrame(data, columns=['data'])
+    data = pd.DataFrame(data)
     dataset = data.join(label)
     dataset = dataset.sample(frac=1)
 
@@ -128,8 +128,11 @@ def run():
 def treinar_modelo():
     dataset = create_dataset()
     lr = LogisticRegression(solver='lbfgs')
-    lr.fit(dataset['data'], dataset['label'])
+    labels = dataset.pop('label')
+    lr.fit(dataset, labels)
     arq = open("model_lr.md", 'wb')
     pickle.dump(lr, arq)
     arq.close()
 
+
+treinar_modelo()
