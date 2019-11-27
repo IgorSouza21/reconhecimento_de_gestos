@@ -20,40 +20,20 @@ algorithms = ['kNN3', 'kNN5', 'kNN7', 'WkNN3', 'WkNN5', 'WkNN7', 'NB',
 
 def values_for_dataframe(values, columns):
     return pd.DataFrame([list(i) for i in zip(*values)], columns=columns)
-    
+
+def extract_GB(img):
+    grayscale = cv2.cvtColor(img.copy(), cv2.COLOR_BGR2GRAY)
+    kernel = cv2.getGaborKernel(ksize=(64, 64), sigma=0.02, theta=0, lambd=1, gamma=0.02, psi=0)
+    afterGB = cv2.filter2D(grayscale, -1, kernel)
+    features = cv2.resize(afterGB, (8, 8))
+    return features.flatten()
 
 def feature_extractor(arrayimgs):
     squarescarac = []
 
     for x in arrayimgs:
-
-        aux = []
-
-        _, c, _ = cv2.findContours(x, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
-
-        # peri = cv2.arcLength(c[0], True)  # perimetro
-        # aux.append(peri)
-        #
-        # aproxx = cv2.approxPolyDP(c[0], 0.04 * peri, True)  # vertices
-        # vertc = len(aproxx)
-        # aux.append(vertc)
-        #
-        # area = cv2.contourArea(c[0])  # area
-        # aux.append(area)
-
-        momentum = cv2.moments(x)   # centroide
-        # cX = int(momentum["m10"] / momentum["m00"])
-        # cY = int(momentum["m01"] / momentum["m00"])
-        #
-        # aux.append(cX)
-        # aux.append(cY)
-
-        moments = cv2.HuMoments(momentum, True).flatten()
-
-        for m in moments:
-            aux.append(m)
-
-        squarescarac.append(aux)
+        feat = extract_GB(x)
+        squarescarac.append(feat)
 
     return squarescarac
 

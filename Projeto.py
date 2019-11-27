@@ -4,6 +4,19 @@ import math
 # from principal import *
 
 
+def remove_face(img):
+    # Load the cascade
+    face_cascade = cv2.CascadeClassifier('haarcascade_frontalface_default.xml')
+    # Convert into grayscale
+    gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+    # Detect faces
+    faces = face_cascade.detectMultiScale(gray, 1.1, 4)
+    # Draw rectangle around the faces
+    for (x, y, w, h) in faces:
+        # cv2.rectangle(img, (x, y), (x + w, y + h), (255, 0, 0), 2)
+        img[x:x+w, y:y+w] = 0
+
+
 def equaliza_histograma(img):
     Y, Cr, Cb = cv2.split(img)
     y = cv2.equalizeHist(Y)
@@ -26,9 +39,9 @@ def binarizar_YCrCb(ent, piso, teto):
     img = ent.copy()
     kernel = np.ones((3, 3), np.uint8)
 
-    #apliico um filtro de mediana para remover a maior parte dos ruídos
+    # aplico um filtro de mediana para remover a maior parte dos ruídos
     img = cv2.medianBlur(img, 13)
-    #threshold
+    # threshold
     img = limiarizar(img)
 
     # #Intervalo de cores em YCrCb para pele (foi calibrado no sangue, suor, lágrimas e tristeza)
@@ -40,7 +53,7 @@ def binarizar_YCrCb(ent, piso, teto):
     # teto = np.array([245, 175, 135], dtype=np.uint8)
 
     mask = cv2.inRange(img, piso, teto)
-    #isso aqui remove a maior parte dos ruidos
+    # isso aqui remove a maior parte dos ruidos
 
     mask = cv2.morphologyEx(mask, cv2.MORPH_CLOSE, kernel, iterations=5)
     # mask = cv2.morphologyEx(mask, cv2.MORPH_CLOSE, kernel, iterations=2)
@@ -83,18 +96,20 @@ def tentativa2(image, piso, teto):
     # cv2.drawContours(mask, cnt_poly, 0, color, cv2.FILLED)
     cv2.rectangle(image, (int(bound_rect[0]), int(bound_rect[1])),
                   (int(bound_rect[0] + bound_rect[2]), int(bound_rect[1] + bound_rect[3])), color, 2)
-
+    cv2.rectangle(mask, (int(bound_rect[0]), int(bound_rect[1])),
+                  (int(bound_rect[0] + bound_rect[2]), int(bound_rect[1] + bound_rect[3])), color, 2)
+    roi = mask[bound_rect[0]:bound_rect[1], bound_rect[0] + bound_rect[2]: bound_rect[1] + bound_rect[3]]
     # cv2.floodFill(drawing, mask1, (int(boundRect[i][0]), int(boundRect[i][1])), (0, 0, 0))
     # cv2.floodFill(drawing, mask1, (0, 0), (0, 0, 0))
 
     # return labeled_img
-    return mask
+    return mask, roi
 
 
-def tentativa3(frame):
+def tentativa3(image):
     kernel = np.ones((3, 3), np.uint8)
 
-    hsv = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
+    hsv = cv2.cvtColor(image, cv2.COLOR_BGR2HSV)
 
     # define range of skin color in HSV
     lower_skin = np.array([0, 20, 70], dtype=np.uint8)
@@ -111,30 +126,17 @@ def tentativa3(frame):
 
     contours, _ = cv2.findContours(mask, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
     cnt = max(contours, key=lambda x: cv2.contourArea(x))
-    contours_poly = [None] * len(contours)
-    boundRect = [None] * len(contours)
-    areas = [None] * len(contours)
-    for i, c in enumerate(contours):
-        contours_poly[i] = cv2.approxPolyDP(c, 3, True)
-        boundRect[i] = cv2.boundingRect(contours_poly[i])
-        width = boundRect[i][2]
-        height = boundRect[i][3]
-        areas[i] = width * height
-    drawing = np.zeros((mask.shape[0], mask.shape[1], 3), dtype=np.uint8)
-    # height, width = image.shape[:-1]
-    # mask1 = np.zeros((height + 2, width + 2), dtype=np.uint8)
-    for i in range(len(contours)):
-        color = (255, 0, 0)
-        # for con in contours_poly:
-        #     cv2.drawContours(drawing, [con], -1, (0, 0, 255), cv2.FILLED)
-        cv2.drawContours(drawing, contours_poly, i, color, cv2.FILLED)
-        if areas[i] > 75000:
-            cv2.rectangle(frame, (int(boundRect[i][0]), int(boundRect[i][1])),
-                          (int(boundRect[i][0] + boundRect[i][2]), int(boundRect[i][1] + boundRect[i][3])), color, 2)
-            cv2.rectangle(drawing, (int(boundRect[i][0]), int(boundRect[i][1])),
-                          (int(boundRect[i][0] + boundRect[i][2]), int(boundRect[i][1] + boundRect[i][3])), color, 2)
+    cnt_poly = cv2.approxPolyDP(cnt, 3, True)
+    bound_rect = cv2.boundingRect(cnt_poly)
+    color = (255, 0, 0)
+    # cv2.drawContours(mask, cnt_poly, 0, color, cv2.FILLED)
+    cv2.rectangle(image, (int(bound_rect[0]), int(bound_rect[1])),
+                  (int(bound_rect[0] + bound_rect[2]), int(bound_rect[1] + bound_rect[3])), color, 2)
+    cv2.rectangle(mask, (int(bound_rect[0]), int(bound_rect[1])),
+                  (int(bound_rect[0] + bound_rect[2]), int(bound_rect[1] + bound_rect[3])), color, 2)
+    roi = mask[bound_rect[0]:bound_rect[1], bound_rect[0] + bound_rect[2]: bound_rect[1] + bound_rect[3]]
 
-    return drawing
+    return mask
 # camera = cv2.VideoCapture(0, cv2.CAP_DSHOW)
 # # Check if the webcam is opened correctly
 # if not camera.isOpened():

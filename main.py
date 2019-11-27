@@ -35,9 +35,9 @@ class CameraClick(BoxLayout):
         ret, frame = self.capture.read()  # captura uma imagem da camera
         piso = np.array([self.ids['minY'].value, self.ids['minCr'].value, self.ids['minCb'].value], dtype=np.uint8)
         teto = np.array([self.ids['maxY'].value, self.ids['maxCr'].value, self.ids['maxCb'].value], dtype=np.uint8)
-        frame2 = Projeto.tentativa2(frame, piso, teto)
+        # frame2 = Projeto.tentativa2(frame, piso, teto)
 
-        # frame2 = Projeto.tentativa3(frame)
+        frame2 = Projeto.tentativa3(frame)
 
         texture1 = self.bufferiza(frame, 'bgr')
         texture2 = self.bufferiza(frame2, 'luminance')
